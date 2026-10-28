@@ -1,0 +1,114 @@
+#include <iostream>
+using namespace std;
+
+const int MAX = 100;
+int arr[MAX];
+int n = 0;
+
+// Function to create the array by reading elements from the user
+void createArray() {
+    cout << "Enter number of elements: ";
+    cin >> n;
+    cout << "Enter " << n << " elements:\n";
+    for (int i = 0; i < n; i++) {
+        cin >> arr[i];
+    }
+}
+
+// Function to display all elements of the array
+void displayArray() {
+    if (n == 0) {
+        cout << "Array is empty.\n";
+        return;
+    }
+
+    cout << "Array elements: ";
+    for (int i = 0; i < n; i++) {
+        cout << arr[i] << " ";
+    }
+    cout << "\n";
+}
+
+// Function to insert a new element at a given position
+void insertElement() {
+    int pos, value;
+
+    if (n >= MAX) {
+        cout << "Array is full. Cannot insert.\n";
+        return;
+    }
+
+    cout << "Enter position to insert (1 to " << n + 1 << "): ";
+    cin >> pos;
+
+    if (pos < 1 || pos > n + 1) {
+        cout << "Invalid position.\n";
+        return;
+    }
+
+    cout << "Enter value to insert: ";
+    cin >> value;
+
+    // Shift elements to the right to make space
+    for (int i = n; i >= pos; i--) {
+        arr[i] = arr[i - 1];
+    }
+
+    arr[pos - 1] = value;
+    n = n + 1;
+
+    cout << "Element inserted successfully.\n";
+}
+
+// Function to delete an element from a given position
+void deleteElement() {
+    int pos;
+
+    if (n == 0) {
+        cout << "Array is empty. Nothing to delete.\n";
+        return;
+    }
+
+    cout << "Enter position to delete (1 to " << n << "): ";
+    cin >> pos;
+
+    if (pos < 1 || pos > n) {
+        cout << "Invalid position.\n";
+        return;
+    }
+
+    // Shift elements to the left
+    for (int i = pos - 1; i < n - 1; i++) {
+        arr[i] = arr[i + 1];
+    }
+
+    n = n - 1;
+    cout << "Element deleted successfully.\n";
+}
+
+int main() {
+    int choice;
+
+    do {
+        cout << "\n----- ARRAY OPERATIONS MENU -----\n";
+        cout << "1. Create Array\n";
+        cout << "2. Display Array\n";
+        cout << "3. Insert Element\n";
+        cout << "4. Delete Element\n";
+        cout << "5. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: createArray(); break;
+            case 2: displayArray(); break;
+            case 3: insertElement(); break;
+            case 4: deleteElement(); break;
+            case 5: cout << "Exiting...\n"; break;
+            default:
+                cout << "Invalid choice. Please try again.\n";
+        }
+    } while (choice != 5);
+
+    return 0;
+}
