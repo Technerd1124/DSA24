@@ -1,0 +1,235 @@
+
+#include <iostream>
+#include <string>
+#include <limits>
+using namespace std;
+
+const int SIZE = 10;
+const int P = 101;
+
+const int EMPTY = 0;
+const int OCCUPIED = 1;
+const int DELETED = 2;
+
+struct Book {
+    int id;
+    string title;
+    string author;
+    int status;
+};
+
+Book table[SIZE];
+
+int hashFunction(int key) {
+    int a = 7;
+    int b = 3;
+
+    return ((a * key + b) % P) % SIZE;
+}
+
+void insertBook(int id, const string& title,
+                const string& author) {
+    int index = hashFunction(id);
+    int deletedIndex = -1;
+
+    for (int i = 0; i < SIZE; i++) {
+        int pos = (index + i) % SIZE;
+
+        if (table[pos].status == OCCUPIED) {
+            if (table[pos].id == id) {
+                cout << "Book ID already exists!\n";
+                return;
+            }
+        }
+        else if (table[pos].status == DELETED) {
+            if (deletedIndex == -1) {
+                deletedIndex = pos;
+            }
+        }
+        else {
+            if (deletedIndex != -1) {
+                pos = deletedIndex;
+            }
+
+            table[pos].id = id;
+            table[pos].title = title;
+            table[pos].author = author;
+            table[pos].status = OCCUPIED;
+
+            cout << "Book inserted successfully!\n";
+            return;
+        }
+    }
+
+    if (deletedIndex != -1) {
+        table[deletedIndex].id = id;
+        table[deletedIndex].title = title;
+        table[deletedIndex].author = author;
+        table[deletedIndex].status = OCCUPIED;
+
+        cout << "Book inserted successfully!\n";
+    }
+    else {
+        cout << "Hash table is full!\n";
+    }
+}
+
+void searchBook(int id) {
+    int index = hashFunction(id);
+
+    for (int i = 0; i < SIZE; i++) {
+        int pos = (index + i) % SIZE;
+
+        if (table[pos].status == EMPTY) {
+            cout << "Book not found!\n";
+            return;
+        }
+
+        if (table[pos].status == OCCUPIED &&
+            table[pos].id == id) {
+            cout << "\nBook Found!\n";
+            cout << "Book ID: " << table[pos].id << endl;
+            cout << "Title: " << table[pos].title << endl;
+            cout << "Author: " << table[pos].author << endl;
+            return;
+        }
+    }
+
+    cout << "Book not found!\n";
+}
+
+void deleteBook(int id) {
+    int index = hashFunction(id);
+
+    for (int i = 0; i < SIZE; i++) {
+        int pos = (index + i) % SIZE;
+
+        if (table[pos].status == EMPTY) {
+            cout << "Book not found!\n";
+            return;
+        }
+
+        if (table[pos].status == OCCUPIED &&
+            table[pos].id == id) {
+            table[pos].status = DELETED;
+            cout << "Book deleted successfully!\n";
+            return;
+        }
+    }
+
+    cout << "Book not found!\n";
+}
+
+void displayBooks() {
+    bool found = false;
+
+    cout << "\n--- Book Records ---\n";
+
+    for (int i = 0; i < SIZE; i++) {
+        if (table[i].status == OCCUPIED) {
+            cout << "\nBook ID: " << table[i].id;
+            cout << "\nTitle: " << table[i].title;
+            cout << "\nAuthor: " << table[i].author;
+            cout << "\nHash Index: " << i << endl;
+
+            found = true;
+        }
+    }
+
+    if (!found) {
+        cout << "No book records available.\n";
+    }
+}
+
+int main() {
+    for (int i = 0; i < SIZE; i++) {
+        table[i].status = EMPTY;
+    }
+
+    int choice, id;
+    string title, author;
+
+    do {
+        cout << "\n===== Book Management System =====\n";
+        cout << "1. Insert Book\n";
+        cout << "2. Search Book\n";
+        cout << "3. Delete Book\n";
+        cout << "4. Display All Books\n";
+        cout << "5. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input! Enter a number.\n";
+            continue;
+        }
+
+        switch (choice) {
+            case 1:
+                cout << "Enter Book ID: ";
+                cin >> id;
+
+                if (cin.fail() || id < 0) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Book ID must be non-negative.\n";
+                    break;
+                }
+
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+                cout << "Enter Book Title: ";
+                getline(cin, title);
+
+                cout << "Enter Author Name: ";
+                getline(cin, author);
+
+                insertBook(id, title, author);
+                break;
+
+            case 2:
+                cout << "Enter Book ID to search: ";
+                cin >> id;
+
+                if (cin.fail() || id < 0) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Invalid Book ID.\n";
+                    break;
+                }
+
+                searchBook(id);
+                break;
+
+            case 3:
+                cout << "Enter Book ID to delete: ";
+                cin >> id;
+
+                if (cin.fail() || id < 0) {
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                    cout << "Invalid Book ID.\n";
+                    break;
+                }
+
+                deleteBook(id);
+                break;
+
+            case 4:
+                displayBooks();
+                break;
+
+            case 5:
+                cout << "Exiting program.\n";
+                break;
+
+            default:
+                cout << "Invalid choice!\n";
+        }
+
+    } while (choice != 5);
+
+    return 0;
+}
